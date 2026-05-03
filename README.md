@@ -1,3 +1,2 @@
 # mern-todo
-
-## I am Learning Devops
+I am Learning Devops
