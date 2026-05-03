@@ -1,0 +1,57 @@
+name: mern ci
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  mongo-init:
+    runs-on: ubuntu-latest   # virtual machine runner
+
+    services:
+      mongo:
+        image: mongo
+        ports: 
+          - 27017:27017
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+
+      - name: Waiting for Mongodb to be ready
+        run: |
+          until nc -z localhost 27017; do
+            echo "Waiting for MongoDB...."
+            sleep 2
+          done
+          echo "MongoDB is up"
+
+      - name: Seed MongoDB
+        working-directory: ./backend
+        run: |
+          npm install 
+          node seedTastData.js
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+    
+      - name: setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+      
+      - name: Install dependencies for backend
+        run: npm install
+      
+      - name: Running Backend tests
+        run: npm test
+
+
